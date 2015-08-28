@@ -1,0 +1,74 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+
+#define MAX 4
+
+//gcc make_data.c -o make_data -lm
+
+
+int length = 0;
+double data[MAX] = {};
+
+void fractal_tree(int n, double bottom, double top, int flag){
+  double md1 = (top - bottom)/4;
+  double md2 = 3*(top - bottom)/4;
+  if(n == 0){ 
+    if(flag == 1){
+      //printf("woh, %f\n",top);
+      if(length<MAX){
+      data[length] = top;
+      length++;
+      } else {
+	printf("Ran out of memory\n");
+      }
+    }
+  } else {
+
+    fractal_tree(n-1, bottom, bottom + md1,0);
+    fractal_tree(n-1, bottom + md2, top, 1);
+  }
+}
+
+double gaussSim(double x1, double y1, double x2, double y2){
+  double sigma = 0.05;
+  double eps = 0.0001;
+  double sqX = (x1 - x2)*(x1 - x2);
+  double sqY = (y1 - y2)*(y1 - y2);
+
+  double out = exp(-(sqX+sqY)/sigma);
+
+  if(out< eps)
+    return 0;
+  else
+    return out;
+}
+
+
+int main(){
+
+  printf("yo %f\n",exp(-3.0));
+  fractal_tree(3,0,1,0);
+  int i, j;
+  double *coordinates = malloc(2*MAX*MAX*sizeof(double));
+  for(i = 0; i<length; i++){
+    //printf("%f\n", data[i]);
+    for(j = 0; j<length; j++){
+      //printf("%d %d %f %f\n", i,j,data[i], data[j]);
+      if(j%2 == 0){
+
+	coordinates[i*MAX + j] = data[i];
+	coordinates[i*MAX + j + 1] = data[j];
+      } else {
+	coordinates[MAX*MAX + i*MAX + j-1] = data[i];
+	coordinates[MAX*MAX + i*MAX + j] = data[j];
+      }
+
+    }
+  }
+
+  printf("length of data: %d\n", length);
+  //for(i=0; i <2*MAX*MAX; i++) printf("%f\n", coordinates[i]);
+  printf("gaussSim: %f\n",gaussSim(0,0,1,1));
+  return 0;
+}
