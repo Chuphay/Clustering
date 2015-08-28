@@ -1,0 +1,7 @@
+/home/chuphay/hadoop/python/cluster/data2/file1.txt cluster_num 1 area 0 perimeter [1, 3]
+/home/chuphay/hadoop/python/cluster/data2/file1.txt 2 in 1
+/home/chuphay/hadoop/python/cluster/data2/file1.txt cluster_num 2 area 0 perimeter [4, 6]
+/home/chuphay/hadoop/python/cluster/data2/file1.txt 5 in 2
+/home/chuphay/hadoop/python/cluster/data2/file2.txt cluster_num 1 area 1 perimeter [2, 7, 2, 4]
+/home/chuphay/hadoop/python/cluster/data2/file2.txt 1 in 1
+/home/chuphay/hadoop/python/cluster/data2/file2.txt 3 in 1

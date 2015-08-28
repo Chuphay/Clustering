@@ -1,0 +1,18 @@
+/home/chuphay/hadoop/python/cluster/data2/file1.txt 1 to 1
+/home/chuphay/hadoop/python/cluster/data2/file1.txt 2 in 1 area 0 perimeter 2
+/home/chuphay/hadoop/python/cluster/data2/file1.txt 3 to 1
+/home/chuphay/hadoop/python/cluster/data2/file1.txt 4 to 2
+/home/chuphay/hadoop/python/cluster/data2/file1.txt 5 in 2 area 0 perimeter 2
+/home/chuphay/hadoop/python/cluster/data2/file1.txt 6 to 2
+/home/chuphay/hadoop/python/cluster/data2/file2.txt 1 in 1 area 1 perimeter 4
+/home/chuphay/hadoop/python/cluster/data2/file2.txt 2 to 1
+/home/chuphay/hadoop/python/cluster/data2/file2.txt 2 to 1
+/home/chuphay/hadoop/python/cluster/data2/file2.txt 3 in 1 area 1 perimeter 4
+/home/chuphay/hadoop/python/cluster/data2/file2.txt 4 to 1
+/home/chuphay/hadoop/python/cluster/data2/file2.txt 7 to 1
+/home/chuphay/hadoop/python/cluster/data2/file3.txt 3 to 2
+/home/chuphay/hadoop/python/cluster/data2/file3.txt 4 in 2 area 1 perimeter 3
+/home/chuphay/hadoop/python/cluster/data2/file3.txt 5 to 2
+/home/chuphay/hadoop/python/cluster/data2/file3.txt 5 to 2
+/home/chuphay/hadoop/python/cluster/data2/file3.txt 6 in 2 area 1 perimeter 3
+/home/chuphay/hadoop/python/cluster/data2/file3.txt 8 in 1 area 0 perimeter 0

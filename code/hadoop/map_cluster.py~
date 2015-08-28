@@ -1,0 +1,4 @@
+import sys
+
+for line is sys.stdin:
+    print(line)

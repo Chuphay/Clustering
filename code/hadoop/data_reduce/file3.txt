@@ -1,0 +1,5 @@
+/home/chuphay/hadoop/python/cluster/data2/file1.txt area 0 nodes [2] perimeter [1, 3]
+/home/chuphay/hadoop/python/cluster/data2/file1.txt area 0 nodes [5] perimeter [4, 6]
+/home/chuphay/hadoop/python/cluster/data2/file2.txt area 1 nodes [1, 3] perimeter [2, 72, 2, 4]
+/home/chuphay/hadoop/python/cluster/data2/file3.txt area 0 nodes [18] perimeter []
+/home/chuphay/hadoop/python/cluster/data2/file3.txt area 1 nodes [4, 6] perimeter [3, 5, 5]
