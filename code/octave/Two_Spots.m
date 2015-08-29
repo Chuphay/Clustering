@@ -1,0 +1,48 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%   Two Spots                           
+%   
+%   Creates a distance matrix based on two standardized Gaussian
+%   distributions separated in 2-D space by a specified radius.
+%
+%   Ins:
+%   m         -- number of points in each cluster
+%   radius    -- radius of separation
+%   
+%   
+%   Outs:
+%   Distance  -- distance matrix
+%   labels    -- actual classification
+%   xy        -- actual data points
+%   
+%
+%
+%   Written by: David Haley
+%   Last Edit: 4/23/2014
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+function [Distance,labels,xy] = Two_Spots(m, radius)
+
+
+X1 = randn(m, 2);              % create cluster 1  (as x,y coord)
+X2 = randn(m, 2);              % create cluster 2
+
+X2(:,1) = X2(:,1)+ radius;     % separate horizontally by radius
+
+labels = [ones(m,1);2*ones(m,1)];
+                               % actual classifications
+
+
+ 
+
+xy = [X1;X2];                 % combine into one data set xy
+
+
+Distance = squareform(pdist(xy));
+                              % distance matrix (uses stats toolbox)
+                              
+
+end

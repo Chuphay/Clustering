@@ -1,0 +1,58 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%   Test Script for CommDetect                          
+%   
+%
+%   Instructions: Run script and hope for the best   
+%
+%
+%
+%   Coded by: David Haley
+%   Last Edit: 07/21/15
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+m = 1000;                   % n data points in each cluster
+kNN = 15;                  % when using kNN
+neighborhood = kNN;         % normalizing factor for distance -> adjacency
+radius = 6;                % distance between clusters
+alpha = 0.30;
+p = 0.5;
+
+
+
+%%%%%%%%%%%%%%%%%
+% Select one of the following generator functions
+%%%%%%%%%%%%%%%%%
+
+
+[Distance,labels,xy] = Two_Spots(m, radius); Distance = Distance.^2;
+%[Distance,labels,xy] = Orbit_Model(m, radius); Distance = Distance.^2;
+%[Distance,labels,xy] = Two_Rings(m, radius); Distance = Distance.^2;
+%[Distance,labels,xy] = Two_Guassians_Function(m, radius);labels = labels';xy = xy';
+%[Distance,labels,xy] = Two_Moons_Function(m, radius);labels = labels';xy = xy';
+%[Distance,labels,xy] = Atom_Model_Function(m, radius);xy = xy';
+
+
+
+% Distance = Square of Distance Matrix
+% labels   = true classification
+% xy       = actual points
+
+%[ W , ~ ] = construct_kNN_graph( Distance , kNN, kNN);
+%[ W , ~ ] = construct_mkNN_graph( Distance , kNN);
+
+W = Distance_To_Adjacency(Distance, neighborhood);
+% W will be (normalized) similarity matrix
+
+
+
+%Visualize_Data(xy,labels);    %graph the actual data
+
+%clusters = Spec_Cluster_Multi(W, num_clusters, dim);
+                          % Separate W into clusters                        
+                          
+clusters = FastCommDetectMod(W, false, alpha, p);
+
+
+Visualize_Data(xy,clusters);   % plot colors according to new classification
