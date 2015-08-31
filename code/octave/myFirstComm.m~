@@ -1,0 +1,92 @@
+m = 100;                   % n data points in each cluster
+kNN = 15;                  % when using kNN
+neighborhood = kNN;         % normalizing factor for distance -> adjacency
+radius = 6;                % distance between clusters
+alpha = 0.30;
+p = 0.5;
+
+[Distance,labels,xy] = Two_Spots(m, radius); Distance = Distance.^2;
+W = Distance_To_Adjacency(Distance, neighborhood);
+
+
+n = size(W)(1);
+D = sum(W,2);
+D_unc = D;
+classes = zeros(n,1);
+unclassified = ones(n,1);
+new_comm = 0;
+    
+
+
+[g, starting_node] = max(unclassified .* (D_unc+1))
+
+new_comm = new_comm + 1;
+
+    
+old_perimeter = 0;   %initialize
+
+Winside = zeros(n,1);
+new_perimeter = sum(W(:,starting_node));
+        
+old_area = 0;        %initialize
+new_area = 0;        %initialize
+        
+inside = zeros(n,1);
+
+present_node = starting_node;
+
+i = 1;
+
+
+while(  (1.0-alpha) * old_perimeter * (new_area-old_area) ...
+                 >= alpha * old_area * (new_perimeter-old_perimeter))
+            
+            %the community is still satisfied, so accept the current neighbor
+            %into the growing community
+            %(this should label the starting_node in the first iteration)
+            classes(present_node) = new_comm;
+
+            %logicals
+            unclassified(present_node) = 0;
+            inside(present_node) = 1;
+        
+            %trap for the case where everything is labelled
+            if (sum(unclassified) <= 0)
+                break;
+            end
+    
+            %update variables
+            old_perimeter = new_perimeter;
+            old_area = new_area;
+            
+            %update the weights leading into the developing community
+            Winside = Winside + W(:,present_node);
+            
+        
+            %decide best neighbor
+            ratios = Winside ./ abs(D - Winside);
+            %put abs here so that ratio is very high if D ~ Winside
+            ratios(D - Winside < eps) = inf;
+            
+            [~, present_node] = max((ratios+1) .* unclassified);
+            %find present node by best ratio and not yet in a community
+            %have to add 1 to ratio so that the lower bound of unclassified
+            %nodes is 1, that way it is > 0 which is the value of classified
+            %nodes
+        
+            %For purposes of next calculation, must include present_node
+            inside(present_node) = true;
+
+            %calculate new perimeter, area
+            new_perimeter = old_perimeter ...
+                            - 2*Winside(present_node) + D(present_node);
+            new_area = old_area + Winside(present_node);
+            
+            if( mod(i, ALERT_AFTER) == 0)
+                disp(['  detection continuing, ', ...
+                    num2str(i), ' found so far']);
+            end
+            
+            i = i + 1;
+
+        endwhile
