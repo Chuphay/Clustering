@@ -17,7 +17,7 @@ function classes  = funIsoClustering( varargin )
     endif
 
 
-    data.W = W; % .^ p;                  %adjacenecy matrix with optional L-p norm stuff...
+    data.W = W .^ p;                  %adjacenecy matrix with optional L-p norm stuff...
     data.N = size(W,2);                  %total number of vertices
     data.D = sum(W,2);                   %degree of each vertex
     classes = ones(data.N,1);            %final classification of the vertices
