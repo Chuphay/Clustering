@@ -1,0 +1,23 @@
+m = 500;                   % n data points in each cluster
+kNN = 15;                  % when using kNN
+neighborhood = kNN;         % normalizing factor for distance -> adjacency
+radius = 10;                % distance between clusters
+alpha = 0.010;
+p = 0.5;
+
+
+[Distance,labels,xy] = Two_Spots(m, radius); Distance = Distance.^2;
+W = Distance_To_Adjacency(Distance, neighborhood);
+
+clusters = funIsoClustering(W, alpha, 1);
+sum(clusters == 2)
+
+possible_classes = [2 3 5 7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71];
+
+%getting rid of everlapping regions
+for prime = possible_classes
+  prime
+endfor
+
+
+Visualize_Data(xy,clusters); 

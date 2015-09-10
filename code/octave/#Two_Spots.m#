@@ -26,7 +26,6 @@
 
 function [Distance,labels,xy] = Two_Spots(m, radius)
 
-%randn("state", 11)
 X1 = randn(m, 2);              % create cluster 1  (as x,y coord)
 X2 = randn(m, 2);              % create cluster 2
 
