@@ -65,7 +65,80 @@ class Cluster(object):
                 out.append(i)
         return out
 
-
+        
+        
+class alpha_clusters(object):
+    def __init__(self, breaks):
+        self.n = len(breaks)
+        self.breaks = breaks
+        self.clusters = {i:{} for i in range(self.n+1)} #+1 for overlap
+        self.clusters[self.n]["overlap"] = []
+        self.clusterId = {i:[] for i in range(self.n)}
+    def get_bin(self, alpha):
+        for i in range(self.n):
+            if(alpha<=self.breaks[i]):
+                break
+        return i
+    def check_overlap(self, clusterId, nodes, my_bin):
+        out = False
+        overlaps = []
+        for x in self.clusters[my_bin]:
+            if(x == clusterId):
+                pass
+            else:
+                tot = sum(np.logical_and(nodes, self.clusters[my_bin][x]))
+                if(tot != 0):
+                    out = True
+                    overlaps.append(x)
+        return (out, overlaps)
+        
+        
+    def add_cluster(self, clusterId, nodes, alpha):
+        my_bin = self.get_bin(alpha)
+        if(clusterId in self.clusterId[my_bin]):
+            #print("already have this", clusterId, my_bin)
+            overlap, notUsing = self.check_overlap(clusterId, nodes, my_bin)
+            if(overlap):
+                #print("Overlap!!")
+                self.clusters[self.n]["overlap"].append(nodes.astype(float))
+            else:
+                self.clusters[my_bin][clusterId] = nodes.astype(float)
+            
+        else:
+            #print("making a new cluster", clusterId, my_bin)
+            overlap, overlapIds = self.check_overlap(clusterId, nodes, my_bin)
+            if(overlap):
+                #print("Probably an Error. There's overlap!!")
+                #print("length of overlaps", len(overlapIds))
+                for x in overlapIds:
+                    del self.clusters[my_bin][x]
+                    self.clusterId[my_bin].remove(x)
+            self.clusterId[my_bin].append(clusterId)
+            self.clusters[my_bin][clusterId] = nodes.astype(float)
+        
+    def readable_nodes(self, clusterId, my_bin):
+        out = []
+        if(my_bin == self.n):
+            list_of_nodes = self.clusters[my_bin]["overlap"]
+            for i in range(len(list_of_nodes)):
+                out.append([])
+                for j in range(len(list_of_nodes[i])):
+                    if(list_of_nodes[i][j] == 1):
+                        out[i].append(j)
+        else:
+            nodes = self.clusters[my_bin][clusterId]
+            for i in range(len(nodes)):
+                if(nodes[i] == 1):
+                    out.append(i)
+        return out
+    def print_clusters(self):
+        out = {}
+        for my_bin in self.clusters:
+            out[my_bin] = {}
+            for clusterId in self.clusters[my_bin]:
+                out[my_bin][clusterId] =  self.readable_nodes(clusterId, my_bin)
+        print(out)
+            
 
 def make_clusters(adjacency, alpha_breaks = [0,1,2], seed = 0):
     graph = np.array(adjacency)
@@ -73,11 +146,13 @@ def make_clusters(adjacency, alpha_breaks = [0,1,2], seed = 0):
     n = len(graph)
     all_nodes = np.eye(n)
     clusters = [Cluster(all_nodes[i],graph[i].astype(float),degrees) for i in range(n)]
+    #clustered = [0 for i in range(n)]
+
+    my_alpha_clusters = alpha_clusters(alpha_breaks)
     binary_cluster = [t_node([i]) for i in range(n)]
 
     where_we_are = [seed]
-    where_we_are_alpha = []
-    for i in range(3*n+2):
+    for i in range(2*n+2):
         here = where_we_are[-1]
         #print("here",here,clusters[here].readable_nodes())
         if(clusters[here].parent):
@@ -86,13 +161,13 @@ def make_clusters(adjacency, alpha_breaks = [0,1,2], seed = 0):
         if(sum(clusters[here].nodes)==n):
             print("Finished after", i, "iterations")
             break
-        if(i == 3*n):
+        if(i == 2*n):
             print("bad break....")
             break
 
 
         next_node, not_using, not_using2, alpha = clusters[here].get_closest()
-        #print("here", here, "next_node", next_node, "alpha", alpha)
+        #print("next_node", next_node, "alpha", alpha)
 
 
         while(clusters[next_node].parent):
@@ -103,36 +178,33 @@ def make_clusters(adjacency, alpha_breaks = [0,1,2], seed = 0):
         if(clusters[here].nodes[next_node_best] == 1):
             #print("match!", next_node)
             where_we_are = [here]
-            where_we_are_alpha = []
             clusters[here].add_nodes(clusters[next_node].nodes,clusters[next_node].weights)
             clusters[next_node].parent = clusters[here]
             clusters[next_node].parentId = here
+            #print(here, clusters[here].readable_nodes())
             binary_cluster[here].union(binary_cluster[next_node])
+            #my_alpha_clusters.add_cluster(here,clusters[here].nodes.astype(float),alpha)
 
-        elif(next_node in where_we_are):
-            #print("found a loop:", where_we_are, next_node, where_we_are_alpha,"here", here)
-            
-            where_we_are_alpha.append(alpha) #sort of messy, but we got to do it
-            minimum_arg = np.argmin(np.array(where_we_are_alpha))
 
-            #print(where_we_are[minimum_arg], where_we_are[(minimum_arg+1)%len(where_we_are)])
-            here = where_we_are[minimum_arg]
-            spot = where_we_are[(minimum_arg +1)%len(where_we_are)]
-            if(clusters[here].parent or clusters[spot].parent):
-                raise SyntaxError
-
-                    
-            clusters[here].add_nodes(clusters[spot].nodes,clusters[spot].weights)
-            clusters[spot].parent = clusters[here]
-            clusters[spot].parentId = here
-            binary_cluster[here].union(binary_cluster[spot])
-            where_we_are = [here]
-            where_we_are_alpha = []
         else:
-            #print("moving on")
-            where_we_are.append(next_node)
-            where_we_are_alpha.append(alpha)
+            if(next_node in where_we_are):
+                #print("found a loop:", where_we_are, next_node)
+                for i in range(len(where_we_are)-1):
 
+                    spot = where_we_are[i]
+                    while(clusters[spot].parent):                   
+                        spot = clusters[spot].parentId
+
+                    clusters[here].add_nodes(clusters[spot].nodes,clusters[spot].weights)
+                    clusters[spot].parent = clusters[here]
+                    clusters[spot].parentId = here
+                    binary_cluster[here].union(binary_cluster[spot])
+                where_we_are = [here]
+            else:
+                where_we_are.append(next_node)  
+
+    #return my_alpha_clusters
+    #print(clusters[here].nodes)
     return binary_cluster[0].get_parent()
 
 if __name__ == "__main__":
