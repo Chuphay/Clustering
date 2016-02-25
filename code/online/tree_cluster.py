@@ -8,18 +8,22 @@ class t_node(object):
         self.parent = None
         self.children = None
         self.num_children = 0
+        self.right_alpha = 0
+        self.left_alpha = 0
 
     def print_nodes(self):
-        print(self.nodes)
+        print(self.nodes, self.right_alpha, self.left_alpha)
 
-    def print_tree(self):
-        self.print_nodes()
+    def print_tree(self,  leaves = False):
+        if(leaves and (self.children == None)):
+            self.print_nodes()
         if(self.children != None):
+            self.print_nodes()
             for child in self.children:
-                child.print_tree()
+                child.print_tree(leaves)
             
             
-    def union(self, that):
+    def union(self, that, right_alpha, left_alpha):
         #print("union", self.nodes, that.nodes)
         cur = self.get_parent()
         that = that.get_parent()
@@ -32,6 +36,8 @@ class t_node(object):
         out = t_node(new_nodes)
         out.num_children = 2
         out.children = [cur, that]
+        out.right_alpha = right_alpha
+        out.left_alpha = left_alpha
         cur.parent = out
         that.parent = out
         return out
