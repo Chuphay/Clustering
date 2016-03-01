@@ -124,7 +124,7 @@ def make_clusters(adjacency,  seed = 0):
 
             
             where_we_are_alpha.append(alpha) #sort of messy, but we got to do it
-            #print("found a loop:", where_we_are, next_node, where_we_are_alpha,"here", here)
+            print("found a loop:", where_we_are, next_node, where_we_are_alpha,"here", here)
 
             backwards_alpha = []
             max_alpha =[]
@@ -162,9 +162,28 @@ def make_clusters(adjacency,  seed = 0):
 
     return binary_cluster[0].get_parent()
 
+
+def make_one_cluster(clust_tree, graph):
+    #print(clust_tree.nodes)
+    n = len(graph)
+    graph = np.array(graph)
+    degrees = np.sum(graph, axis = 1) 
+    weights = np.zeros(n)
+    nodes = np.zeros(n)
+    for x in clust_tree.nodes:
+        nodes[x] = 1 
+        weights += graph[x]
+    area = 0
+    for x in clust_tree.nodes:
+        area += weights[x]/2.0
+    perimeter = sum(weights) - 2*area
+    return Cluster(clust_tree.nodes[0], nodes, weights, degrees, perimeter, area)
+
 if __name__ == "__main__":
     graph = np.array([[0,1,1,0,0,0],[1,0,1,0,0,0],[1,1,0,1,0,0],[0,0,1,0,1,1],[0,0,0,1,0,1],[0,0,0,1,1,0]])
     clusters = make_clusters(graph)
     #clusters.print_nodes()
     clusters.print_tree()
     print("u")
+    myCluster = make_one_cluster(clusters.children[1], graph)
+    print(myCluster.get_closest())
