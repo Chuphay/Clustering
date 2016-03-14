@@ -21,6 +21,7 @@ class Cluster(object):
         self.my_id = my_id
             
     def get_closest(self):
+        #print("getting closest", self.my_id)
         if(sum(self.nodes) == len(self.nodes)):
             raise IndexError
         if(sum(self.weights) == 0):
@@ -28,15 +29,16 @@ class Cluster(object):
         if (self.parent == None):
             temp_perimeter = self.perimeter - 2*self.weights + self.degrees
             temp_area = self.area + self.weights 
-            ratios = temp_area / (temp_perimeter + 0.000001)
-            #ratios = self.weights/(abs(self.degrees - self.weights) + 0.000001)
+            #ratios = temp_area / (temp_perimeter + 0.000001)
+            ratios = self.weights/(self.degrees - self.weights + 0.00001)
             next_vertex = np.argmax(ratios * np.logical_not(self.nodes))
-            this_alpha = (self.area*temp_perimeter[next_vertex])/(self.perimeter*temp_area[next_vertex]) 
+            this_alpha = (self.area*temp_perimeter[next_vertex])/(self.perimeter*temp_area[next_vertex])
             return (next_vertex,  this_alpha)
         else:
             return self.parent.get_closest()
         
     def get_alpha(self, other_nodes):
+        #print("getting_alpha")
         if(sum(self.nodes) == len(self.nodes)):
             raise IndexError
         if(sum(self.weights) == 0):
@@ -46,7 +48,8 @@ class Cluster(object):
         if (self.parent == None):
             temp_perimeter = self.perimeter - 2*self.weights + self.degrees
             temp_area = self.area + self.weights 
-            ratios = temp_area / (temp_perimeter + 0.000001)
+            #ratios = temp_area / (temp_perimeter + 0.000001)
+            ratios = self.weights/(self.degrees - self.weights + 0.00001)
             next_vertex = np.argmax(ratios * other_nodes)
             this_alpha = (self.area*temp_perimeter[next_vertex])/(self.perimeter*temp_area[next_vertex])
             return (this_alpha, next_vertex)
@@ -125,7 +128,7 @@ def make_clusters(adjacency,  seed = 0):
 
             
             where_we_are_alpha.append(alpha) #sort of messy, but we got to do it
-            #print("found a loop:", where_we_are, next_node, where_we_are_alpha,"here", here)
+            print("found a loop:", where_we_are, next_node, where_we_are_alpha,"here", here)
             
             backwards_alpha = []
             max_alpha =[] #actually we are doing the average
@@ -188,9 +191,17 @@ def make_one_cluster(clust_tree, graph):
 
 if __name__ == "__main__":
     graph = np.array([[0,1,1,0,0,0],[1,0,1,0,0,0],[1,1,0,1,0,0],[0,0,1,0,1,1],[0,0,0,1,0,1],[0,0,0,1,1,0]])
+    #graph = np.array([[0,1,0.1,0,0,0],
+    #                  [1,0,0,0.1,0,0],
+    #                  [0.1,0,0,1,0.1,0],
+    #                  [0,0.1,1,0,0,0.1],
+    #                  [0,0,0.1,0,0,1],
+    #                  [0,0,0,0.1,1,0]])
     clusters = make_clusters(graph)
     #clusters.print_nodes()
     clusters.print_tree()
     print("u")
     myCluster = make_one_cluster(clusters.children[1], graph)
     print(myCluster.get_closest())
+    print(1.2/(1.1*0.2))
+    print(1.3/(1.1*0.4))
