@@ -66,6 +66,13 @@ class Cluster(object):
         self.nodes = self.nodes + node_vector
         self.area = sum(self.weights*self.nodes)/2.0
         self.perimeter = sum(self.weights) - 2*self.area
+
+    def get_change(self, other_nodes):
+        cur = self.__get_parent()
+        temp_area = sum(cur.weights*other_nodes)
+        temp_perimeter = - 2*sum(cur.weights*other_nodes) + sum(cur.degrees*other_nodes)
+        return (temp_area, -temp_perimeter)
+
         
     def readable_nodes(self):
         out = []
@@ -78,6 +85,15 @@ class Cluster(object):
         while(cur.parent):
             cur = cur.parent
         return cur.my_id
+    def __get_parent(self):
+        cur = self
+        while(cur.parent):
+            cur = cur.parent
+        return cur
+
+    def get_nodes(self):
+        cur = self.__get_parent()
+        return cur.nodes
 
 
 
@@ -108,15 +124,29 @@ def make_clusters(adjacency,  seed = 0):
 
         next_node, alpha = clusters[here].get_closest()
         #print("here", here, "next_node", next_node, "alpha", alpha)
+        #print(clusters[next_node].get_nodes())
+        #print(clusters[here].get_change(clusters[next_node].get_nodes()))
 
 
         while(clusters[next_node].parent):
             next_node = clusters[next_node].parentId
 
         next_node_best, next_node_alpha = clusters[next_node].get_closest()
-
+        #print("alphas", alpha, next_node_alpha)
         if(clusters[here].nodes[next_node_best] == 1):
             #print("match!", next_node)
+            #print(clusters[next_node].get_change(clusters[here].get_nodes()))
+            where_we_are = [here]
+            where_we_are_alpha = []
+            clusters[here].add_nodes(clusters[next_node].nodes,clusters[next_node].weights)
+            clusters[next_node].parent = clusters[here]
+            clusters[next_node].parentId = here
+            binary_cluster[here].union(binary_cluster[next_node], alpha, next_node_alpha)
+
+
+        elif(alpha < next_node_alpha):
+            print("Takeover!!!", alpha, next_node_alpha, here, next_node)
+            #print(clusters[next_node].get_change(clusters[here].get_nodes()))
             where_we_are = [here]
             where_we_are_alpha = []
             clusters[here].add_nodes(clusters[next_node].nodes,clusters[next_node].weights)
@@ -167,6 +197,7 @@ def make_clusters(adjacency,  seed = 0):
             where_we_are_alpha = []
         else:
             #print("moving on")
+            #print(clusters[next_node].get_change(clusters[here].get_nodes()))
             where_we_are.append(next_node)
             where_we_are_alpha.append(alpha)
 
@@ -190,18 +221,25 @@ def make_one_cluster(clust_tree, graph):
     return Cluster(clust_tree.nodes[0], nodes, weights, degrees, perimeter, area)
 
 if __name__ == "__main__":
+
+    graph = np.array([[0,1,0.1,0,0,0],
+                      [1,0,0,0.1,0,0],
+                      [0.1,0,0,1,0.1,0],
+                      [0,0.1,1,0,0,0.1],
+                      [0,0,0.1,0,0,1],
+                      [0,0,0,0.1,1,0]])
     graph = np.array([[0,1,1,0,0,0],[1,0,1,0,0,0],[1,1,0,1,0,0],[0,0,1,0,1,1],[0,0,0,1,0,1],[0,0,0,1,1,0]])
-    #graph = np.array([[0,1,0.1,0,0,0],
-    #                  [1,0,0,0.1,0,0],
-    #                  [0.1,0,0,1,0.1,0],
-    #                  [0,0.1,1,0,0,0.1],
-    #                  [0,0,0.1,0,0,1],
-    #                  [0,0,0,0.1,1,0]])
+    np.random.seed(13)
+    n = 8
+    thing1 = np.random.randn(n*n).reshape(n,n)
+    thing1 = abs(thing1.T + thing1)
+    for i in range(n):
+        thing1[i][i] = 0
+    graph = thing1
     clusters = make_clusters(graph)
     #clusters.print_nodes()
-    clusters.print_tree()
-    print("u")
+    #clusters.print_tree()
+
     myCluster = make_one_cluster(clusters.children[1], graph)
     print(myCluster.get_closest())
-    print(1.2/(1.1*0.2))
-    print(1.3/(1.1*0.4))
+
